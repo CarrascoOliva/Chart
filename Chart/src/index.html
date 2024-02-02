@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <title>Chart</title>
@@ -7,21 +8,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
+
 <body>
   <app-root></app-root>
   <div>
     <canvas id="myChart"></canvas>
   </div>
-  
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
+
   <script>
     const ctx = document.getElementById('myChart');
-  
+
     new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+        labels: ['Hola', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
         datasets: [{
           label: '# of Votes',
           data: [12, 19, 3, 5, 2, 3],
@@ -38,4 +40,5 @@
     });
   </script>
 </body>
+
 </html>
