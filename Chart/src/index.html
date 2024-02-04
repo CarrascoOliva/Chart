@@ -3,39 +3,209 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Chart</title>
+  <title>Registro de Gastos de Viaje</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="	https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <script src="	https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
 </head>
 
 <body>
   <app-root></app-root>
-  <div>
-    <canvas id="myChart"></canvas>
+  <header class="header p-3 " style="background-color: #e3f2fd;">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col text-center">
+          <h1>Gestor de gastos de viaje</h1>
+        </div>
+        <div class="col-auto">
+          <div class="input-group">
+            <input type="text" id="nameInput" class="form-control" placeholder="Nombre">
+            <button id="addPerson" type="button" class="btn btn-outline-primary">Añadir</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="container">
+
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div id="welcomeText" >
+          Esta web es una herramienta para gestionar los gastos de viaje de forma fácil y eficiente. Con esta web,
+          puedes crear un viaje e invitar a otras personas a participar, o bien registrar tus propios gastos si viajas
+          solo. La web te permite introducir los gastos por categorías (transporte, alojamiento, comida,
+          entretenimiento) y por fecha, indicando el importe y la moneda. También puedes adjuntar fotos de los recibos o
+          facturas. La web te muestra un resumen de los gastos totales por persona. Además, puedes comparar los gastos
+          de categorías.
+        </div>
+        <div id="charts"></div>
+        <div class="alerta"></div>
+      </div>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
-    const ctx = document.getElementById('myChart');
+    const chartsDiv = document.getElementById('charts');
+    const addPersonButton = document.getElementById('addPerson');
+    const nameInput = document.getElementById('nameInput');
+    const welcomeText = document.getElementById('welcomeText');
 
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['Hola', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-        datasets: [{
-          label: '# of Votes',
-          data: [12, 19, 3, 5, 2, 3],
-          borderWidth: 1
-        }]
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true
+    function createFormAndChart(personId, name) {
+      const form = document.createElement('form');
+      form.id = `expenseForm${personId}`;
+      form.classList.add('mb-3');
+
+      const h1 = document.createElement('h1');
+      h1.textContent = name;
+      h1.classList.add('mt-3');
+
+      form.appendChild(h1);
+
+      const row = document.createElement('div');
+      row.classList.add('row');
+
+      const labels = ['Día', 'Comida', 'Transporte', 'Alojamiento', 'Entretenimiento'];
+      labels.forEach(label => {
+        const div = document.createElement('div');
+        div.classList.add('col', 'mb-3');
+
+        const labelElement = document.createElement('label');
+        labelElement.for = `${label}${personId}`;
+        labelElement.textContent = label.charAt(0).toUpperCase() + label.slice(1) + ':';
+        div.appendChild(labelElement);
+
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.id = `${label}${personId}`;
+        input.name = label;
+        input.classList.add('form-control');
+        div.appendChild(input);
+
+        row.appendChild(div);
+      });
+
+      form.appendChild(row);
+
+      const submit = document.createElement('input');
+      submit.type = 'submit';
+      submit.value = 'Agregar gastos';
+      submit.classList.add('btn', 'btn-primary', 'mt-1');
+
+      form.appendChild(submit);
+
+
+
+      const canvas = document.createElement('canvas');
+      canvas.id = `myChart${personId}`;
+
+      const totalDiv = document.createElement('div');
+      totalDiv.id = `total${personId}`;
+      totalDiv.classList.add('total-gastado');
+
+      const hr = document.createElement('hr');
+
+      chartsDiv.appendChild(form);
+      chartsDiv.appendChild(canvas);
+      chartsDiv.appendChild(totalDiv);
+      chartsDiv.appendChild(hr);
+
+      const ctx = document.getElementById(`myChart${personId}`);
+
+      const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Día 1', 'Día 2', 'Día 3', 'Día 4', 'Día 5'],
+          datasets: [{
+            label: 'Comida',
+            data: [0, 0, 0, 0, 0],
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1
+          },
+          {
+            label: 'Transporte',
+            data: [0, 0, 0, 0, 0],
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+          },
+          {
+            label: 'Alojamiento',
+            data: [0, 0, 0, 0, 0],
+            backgroundColor: 'rgba(255, 206, 86, 0.2)',
+            borderColor: 'rgba(255, 206, 86, 1)',
+            borderWidth: 1
+          },
+          {
+            label: 'Entretenimiento',
+            data: [0, 0, 0, 0, 0],
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          plugins: {
+            title: {
+              display: true,
+              text: 'Gastos de ' + name,
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function (value, index, values) {
+                  return value + ' €';
+                }
+              }
+            }
           }
         }
+      });
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const Día = document.getElementById(`Día${personId}`).value - 1;
+        const Comida = document.getElementById(`Comida${personId}`).value;
+        const Transporte = document.getElementById(`Transporte${personId}`).value;
+        const Alojamiento = document.getElementById(`Alojamiento${personId}`).value;
+        const Entretenimiento = document.getElementById(`Entretenimiento${personId}`).value;
+
+        chart.data.datasets[0].data[Día] += Number(Comida);
+        chart.data.datasets[1].data[Día] += Number(Transporte);
+        chart.data.datasets[2].data[Día] += Number(Alojamiento);
+        chart.data.datasets[3].data[Día] += Number(Entretenimiento);
+
+        chart.update();
+
+
+        const totalGastado = chart.data.datasets.reduce((total, dataset) => total + dataset.data.reduce((a, b) => a + b, 0), 0);
+        totalDiv.textContent = `Total gastado: ${totalGastado} €`;
+      });
+    }
+
+    addPersonButton.addEventListener('click', function () {
+      const personId = Date.now();
+      const name = nameInput.value;
+      if (name) {
+        createFormAndChart(personId, name);
+        nameInput.value = '';
+        welcomeText.style.display = 'none';
+      } else {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-warning alert-dismissible fade show';
+        alertDiv.role = 'alert';
+        alertDiv.innerHTML = 'Por favor, introduce un nombre. <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+
+        const alertContainer = document.querySelector('.alerta');
+        alertContainer.appendChild(alertDiv);
       }
     });
   </script>
